@@ -1,0 +1,1 @@
+const mod = require('./src/db.js'); const db = mod.abrirBanco(); console.log('DB type:', typeof db); if (db.pool) { db.pool.query('SELECT 1', (err, r) => { console.log('PG err:', err ? err.message : 'ok'); console.log('PG result:', r); process.exit(0); }); } else { console.log('SQLite mode, type:', db.constructor ? db.constructor.name : 'sync'); process.exit(0); } )

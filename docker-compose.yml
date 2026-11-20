@@ -1,0 +1,23 @@
+services:
+  vendas:
+    build: .
+    ports:
+      - "8787:8787"
+    environment:
+      SALES_API_KEY: ${SALES_API_KEY:?defina SALES_API_KEY no .env}
+      # Modo PostgreSQL no Supabase (substitua pela sua connection string)
+      SALES_DB: postgresql://postgres:sistema-vendas-mcp@db.nicolxbifbvlpbrdvlnq.supabase.co:5432/postgres
+      HOST: 0.0.0.0
+      RATE_LIMIT: ${RATE_LIMIT:-120}
+      PIX_CHAVE: ${PIX_CHAVE:-}
+      PIX_NOME: ${PIX_NOME:-}
+      PIX_CIDADE: ${PIX_CIDADE:-}
+    volumes:
+      - ./data:/app/data
+      - ./backups:/app/backups
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8787/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

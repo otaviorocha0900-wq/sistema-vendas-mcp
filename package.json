@@ -1,0 +1,26 @@
+{
+  "name": "sistema-vendas-mcp",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Sistema de vendas sem interface: API HTTP + servidor MCP para uma IA operar produtos, clientes, pedidos e pagamentos.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "api": "node src/api.js",
+    "mcp": "node src/mcp.js",
+    "seed": "node src/seed.js",
+    "backup": "node scripts/backup.js",
+    "restore:test": "node scripts/test-restore.js",
+    "estoque:baixo": "node scripts/alerta-estoque.js",
+    "fechamento": "node scripts/fechamento.js",
+    "smoke:mcp": "node scripts/smoke-mcp.js",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4"
+  }
+}
