@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 ENV NODE_ENV=production
@@ -9,7 +9,7 @@ RUN npm ci --omit=dev
 COPY src ./src
 COPY scripts ./scripts
 
-RUN mkdir -p data backups relatorios && chown -R node:node /app
+RUN mkdir -p data backups relatorios
 USER node
 
 EXPOSE 8787
