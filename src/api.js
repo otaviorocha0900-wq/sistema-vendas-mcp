@@ -1,16 +1,16 @@
-const http = require("node:http");
-const https = require("node:https");
-const { randomUUID } = require("node:crypto");
-const { readFileSync } = require("node:fs");
-const { pathToFileURL } = require("node:url");
-const { StreamableHTTPServerTransport } = require("@modelcontextprotocol/sdk/server/streamableHttp.js");
-const { isInitializeRequest } = require("@modelcontextprotocol/sdk/types.js");
-const { abrirBanco: abrirBancoDb } = require("./db.js");
-const { autenticar, criarChave, garantirChaveBootstrap, listarChaves, revogarChave } = require("./auth.js");
-const { listarAuditoria } = require("./auditoria.js");
-const { criarServidorMcp } = require("./mcp-server.js");
-const { qrSvgDataUrl } = require("./pix.js");
-const {
+import http from "node:http";
+import https from "node:https";
+import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
+import { abrirBanco } from "./db.js";
+import { autenticar, criarChave, garantirChaveBootstrap, listarChaves, revogarChave } from "./auth.js";
+import { listarAuditoria } from "./auditoria.js";
+import { criarServidorMcp } from "./mcp-server.js";
+import { qrSvgDataUrl } from "./pix.js";
+import {
   ErroNegocio,
   atualizarEstoque,
   buscarClientes,
@@ -28,7 +28,7 @@ const {
   registrarPagamento,
   relatorioVendas,
   resumoEstoqueBaixo,
-} = require("./core.js");
+} from "./core.js";
 
 const PORTA = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || "127.0.0.1";
@@ -149,12 +149,5 @@ function fecharBanco() {
 // para ativar o modo PG, ou pode continuar com SQLite local.
 
 // ----- FIM api.js adjustments -----
-
-// Exports for CommonJS (Render compatibility)
-module.exports = {
-  abrirBanco,
-  aplicarSchemaPG,
-  fecharBanco,
-};
 
 // ... (o restante do arquivo continua inalterado)

@@ -1,9 +1,9 @@
-const { DatabaseSync } = require("node:sqlite");
-const { Pool } = require("pg");
-const { mkdirSync } = require("node:fs");
-const { dirname, resolve } = require("node:path");
+import { DatabaseSync } from "node:sqlite";
+import { Pool } from "pg";
+import { mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 
-const CAMINHO_PADRAO = resolve(process.cwd(), "data", "vendas.db");
+export const CAMINHO_PADRAO = resolve(process.cwd(), "data", "vendas.db");
 
 // --- Modo SQLite (padrão, para desenvolvimento local) ---
 function criarPoolSQLite(caminho = CAMINHO_PADRAO) {
@@ -38,12 +38,12 @@ function criarPoolPG() {
 }
 
 // Retorna o pool PG ou null se não configurado
-function getPoolPG() {
+export function getPoolPG() {
   return poolPG;
 }
 
 // Abre banco: se SALES_DB for URL postgres/pg, usa PG; senão, usa SQLite local
-function abrirBanco(caminho = CAMINHO_PADRAO) {
+export function abrirBanco(caminho = CAMINHO_PADRAO) {
   // Se vier postgres:// ou postgresql:// ou http://supabase..., trata como PG
   if (
     typeof caminho === "string" &&
@@ -86,40 +86,28 @@ function abrirBanco(caminho = CAMINHO_PADRAO) {
 }
 
 // Aplicar schema no PG (já foi feito manualmente no painel, mas pode ser refeito)
-function aplicarSchemaPG() {
+export function aplicarSchemaPG() {
   // O schema já foi aplicado no painel do Supabase nas tabelas produtos, clientes, pedidos, etc.
   // Esta função pode ser usada para re-aplicar ou init em outro projeto.
   console.log("[db] Schema PG já foi aplicado no painel do Supabase. Use SALES_DB=postgresql://... para ativar o modo PG.");
 }
 
 // Fechar conexões
-function fecharBanco() {
+export function fecharBanco() {
   // Se houver pool PG, pode ser fechado aqui se necessário
 }
 
 // Migrador simplificado: lê o schema SQLite e gera o equivalente PG
 // Usado quando se quer migrar dados de SQLite para PG
-function migrarParaPG(dbSQLite, poolPG) {
+export function migrarParaPG(dbSQLite, poolPG) {
   // Versão simplificada: esta função seria chamada para mover dados.
   // Para o MVP, recomendamos usar o schema já aplicado no Supabase.
   console.log("Use aplicarSchemaPG() e as tabelas já criadas no Supabase.");
 }
 
-// Exports for CommonJS (Render compatibility)
-module.exports = {
-  CAMINHO_PADRAO,
-  getPoolPG,
-  abrirBanco,
-  aplicarSchemaPG,
-  fecharBanco,
-  migrarParaPG,
-};
-
 // Se executado diretamente, mostra instruções
-if (require.main === module) {
-  console.log("Modos de uso:");
-  console.log("1) Local (SQLite): npm run api  (sem SALES_DB)");
-  console.log("2) Supabase (PG):   SALES_DB=postgresql://user:pass@host:5432/db npm run api");
-  console.log(""); console.log("O schema já foi aplicado no painel do Supabase. As tabelas produtos, clientes, pedidos, pagamentos e índices estão prontos.");
-  console.log(""); console.log("Para mudar do SQLite para PG, basta definir a variável de ambiente SALES_DB com a URL completa e reiniciar a API.");
-}
+console.log("Modos de uso:");
+console.log("1) Local (SQLite): npm run api  (sem SALES_DB)");
+console.log("2) Supabase (PG):   SALES_DB=postgresql://user:pass@host:5432/db npm run api");
+console.log(""); console.log("O schema já foi aplicado no painel do Supabase. As tabelas produtos, clientes, pedidos, pagamentos e índices estão prontos.");
+console.log(""); console.log("Para mudar do SQLite para PG, basta definir a variável de ambiente SALES_DB com a URL completa e reiniciar a API.");
