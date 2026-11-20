@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
-import { abrirBanco } from "./db.js";
 import { autenticar, criarChave, garantirChaveBootstrap, listarChaves, revogarChave } from "./auth.js";
 import { listarAuditoria } from "./auditoria.js";
 import { criarServidorMcp } from "./mcp-server.js";
@@ -66,67 +65,6 @@ function tentarConectarPG(url) {
     console.error("PG pool setup error:", e.message);
     return false;
   }
-}
-
-// Função para abrir banco: modo SQLite (padrão) ou PG se SALES_DB for postgres://
-function abrirBanco(caminho = CAMINHO_PADRAO) {
-  // Se vier postgres:// ou http://supabase.projeto..., tentamos PG
-  if (
-    typeof caminho === "string" &&
-    (caminho.startsWith("postgres://") ||
-      (caminho.includes("supabase.co") &&
-        !caminho.includes("data/vendas.db")))
-  ) {
-    // Modo PG: tentar usar pool existente ou criar
-    if (!dbPoolPG) {
-      // O pg Pool precisa de string de conexão completa; como não temos senha,
-      // vamos tentar usar a URL do projeto Supabase com pg para ver se conecta.
-      // Se não conseguir, cai para SQLite com aviso.
-      console.log(
-        "[db] SALES_DB aponta para Supabase, mas pool PG ainda não inicializado. Usando SQLite como padrão."
-      );
-      setDbMode("sqlite");
-    }
-    // Retorna um objeto com métodos compatíveis com o uso no core/api
-    return {
-      pool: dbPoolPG,
-      query: (sql, params) => {
-        return new Promise((resolve, reject) => {
-          if (dbPoolPG) {
-            dbPoolPG.query(sql, params, (err, res) => {
-              if (err) return reject(err);
-              resolve(res.rows);
-            });
-          } else {
-            reject(new Error("Pool PG não inicializado. Use SALES_DB=postgres://... ou mode sqlite."));
-          }
-        });
-      },
-      execute: (sql, params) => {
-        return new Promise((resolve, reject) => {
-          if (dbPoolPG) {
-            dbPoolPG.query(sql, params, (err) => {
-              if (err) return reject(err);
-              resolve();
-            });
-          } else {
-            reject(new Error("Pool PG não inicializado."));
-          }
-        });
-      },
-      close: () => {
-        // não fechamos automaticamente para permitir reutilização
-      },
-    };
-  }
-
-  // Modo SQLite original
-  if (caminho !== ":memory:") mkdirSync(dirname(caminho), { recursive: true });
-  const db = new DatabaseSync(caminho);
-  db.exec("PRAGMA journal_mode = WAL;");
-  db.exec("PRAGMA foreign_keys = ON;");
-  db.exec("PRAGMA busy_timeout = 5000;");
-  return db;
 }
 
 // Aplicar schema no PG (já foi feito manualmente no painel, mas pode ser refeito)
