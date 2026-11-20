@@ -1,16 +1,16 @@
-import http from "node:http";
-import https from "node:https";
-import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { pathToFileURL } from "node:url";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
-import { abrirBanco } from "./db.js";
-import { autenticar, criarChave, garantirChaveBootstrap, listarChaves, revogarChave } from "./auth.js";
-import { listarAuditoria } from "./auditoria.js";
-import { criarServidorMcp } from "./mcp-server.js";
-import { qrSvgDataUrl } from "./pix.js";
-import {
+const http = require("node:http");
+const https = require("node:https");
+const { randomUUID } = require("node:crypto");
+const { readFileSync } = require("node:fs");
+const { pathToFileURL } = require("node:url");
+const { StreamableHTTPServerTransport } = require("@modelcontextprotocol/sdk/server/streamableHttp.js");
+const { isInitializeRequest } = require("@modelcontextprotocol/sdk/types.js");
+const { abrirBanco: abrirBancoDb } = require("./db.js");
+const { autenticar, criarChave, garantirChaveBootstrap, listarChaves, revogarChave } = require("./auth.js");
+const { listarAuditoria } = require("./auditoria.js");
+const { criarServidorMcp } = require("./mcp-server.js");
+const { qrSvgDataUrl } = require("./pix.js");
+const {
   ErroNegocio,
   atualizarEstoque,
   buscarClientes,
@@ -28,7 +28,7 @@ import {
   registrarPagamento,
   relatorioVendas,
   resumoEstoqueBaixo,
-} from "./core.js";
+} = require("./core.js");
 
 const PORTA = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || "127.0.0.1";
@@ -69,7 +69,7 @@ function tentarConectarPG(url) {
 }
 
 // Função para abrir banco: modo SQLite (padrão) ou PG se SALES_DB for postgres://
-export function abrirBanco(caminho = CAMINHO_PADRAO) {
+function abrirBanco(caminho = CAMINHO_PADRAO) {
   // Se vier postgres:// ou http://supabase.projeto..., tentamos PG
   if (
     typeof caminho === "string" &&
@@ -130,14 +130,14 @@ export function abrirBanco(caminho = CAMINHO_PADRAO) {
 }
 
 // Aplicar schema no PG (já foi feito manualmente no painel, mas pode ser refeito)
-export async function aplicarSchemaPG() {
+function aplicarSchemaPG() {
   // O schema já foi aplicado no painel do Supabase nas tabelas produtos, clientes, pedidos, etc.
   // Esta função pode ser usada para re-aplicar ou init em outro projeto.
   console.log("[db] Schema PG já foi aplicado no painel do Supabase. Use o modo sqlite ou configure SALES_DB=postgres://...");
 }
 
 // Fechar conexões
-export async function fecharBanco() {
+function fecharBanco() {
   // Se houver pool PG, pode ser fechado aqui se necessário
 }
 
@@ -149,5 +149,12 @@ export async function fecharBanco() {
 // para ativar o modo PG, ou pode continuar com SQLite local.
 
 // ----- FIM api.js adjustments -----
+
+// Exports for CommonJS (Render compatibility)
+module.exports = {
+  abrirBanco,
+  aplicarSchemaPG,
+  fecharBanco,
+};
 
 // ... (o restante do arquivo continua inalterado)

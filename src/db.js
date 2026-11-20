@@ -1,9 +1,9 @@
-import { DatabaseSync } from "node:sqlite";
-import { Pool } from "pg";
-import { mkdirSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+const { DatabaseSync } = require("node:sqlite");
+const { Pool } = require("pg");
+const { mkdirSync } = require("node:fs");
+const { dirname, resolve } = require("node:path");
 
-export const CAMINHO_PADRAO = resolve(process.cwd(), "data", "vendas.db");
+const CAMINHO_PADRAO = resolve(process.cwd(), "data", "vendas.db");
 
 // --- Modo SQLite (padrão, para desenvolvimento local) ---
 function criarPoolSQLite(caminho = CAMINHO_PADRAO) {
@@ -38,12 +38,12 @@ function criarPoolPG() {
 }
 
 // Retorna o pool PG ou null se não configurado
-export function getPoolPG() {
+function getPoolPG() {
   return poolPG;
 }
 
 // Abre banco: se SALES_DB for URL postgres/pg, usa PG; senão, usa SQLite local
-export function abrirBanco(caminho = CAMINHO_PADRAO) {
+function abrirBanco(caminho = CAMINHO_PADRAO) {
   // Se vier postgres:// ou postgresql:// ou http://supabase..., trata como PG
   if (
     typeof caminho === "string" &&
@@ -86,24 +86,34 @@ export function abrirBanco(caminho = CAMINHO_PADRAO) {
 }
 
 // Aplicar schema no PG (já foi feito manualmente no painel, mas pode ser refeito)
-export async function aplicarSchemaPG() {
+function aplicarSchemaPG() {
   // O schema já foi aplicado no painel do Supabase nas tabelas produtos, clientes, pedidos, etc.
   // Esta função pode ser usada para re-aplicar ou init em outro projeto.
   console.log("[db] Schema PG já foi aplicado no painel do Supabase. Use SALES_DB=postgresql://... para ativar o modo PG.");
 }
 
 // Fechar conexões
-export async function fecharBanco() {
+function fecharBanco() {
   // Se houver pool PG, pode ser fechado aqui se necessário
 }
 
 // Migrador simplificado: lê o schema SQLite e gera o equivalente PG
 // Usado quando se quer migrar dados de SQLite para PG
-export function migrarParaPG(dbSQLite, poolPG) {
+function migrarParaPG(dbSQLite, poolPG) {
   // Versão simplificada: esta função seria chamada para mover dados.
   // Para o MVP, recomendamos usar o schema já aplicado no Supabase.
   console.log("Use aplicarSchemaPG() e as tabelas já criadas no Supabase.");
 }
+
+// Exports for CommonJS (Render compatibility)
+module.exports = {
+  CAMINHO_PADRAO,
+  getPoolPG,
+  abrirBanco,
+  aplicarSchemaPG,
+  fecharBanco,
+  migrarParaPG,
+};
 
 // Se executado diretamente, mostra instruções
 if (require.main === module) {

@@ -3,7 +3,6 @@
   "version": "0.2.0",
   "private": true,
   "description": "Sistema de vendas sem interface: API HTTP + servidor MCP para uma IA operar produtos, clientes, pedidos e pagamentos.",
-  "type": "module",
   "engines": {
     "node": ">=22"
   },
